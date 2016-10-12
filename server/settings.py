@@ -1,4 +1,4 @@
 
 HOST = "138.68.90.93"
 PORT = 9200
-INDEX = "blog"
+INDEX = "arxiv"

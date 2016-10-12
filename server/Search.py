@@ -14,7 +14,6 @@ class Search(object):
         pass
 
     def request(self, query):
-        result = self.connecton.search(index=INDEX, body={"query": {"match": {'title': query}}})
+        result = self.connecton.search(index=INDEX, body={'query': {'match': {'abstract': query}}})
         response = result['hits']['hits']
         return list(map(lambda x: x['_source'], response))
-

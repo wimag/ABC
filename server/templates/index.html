@@ -39,10 +39,10 @@
         {% for item in search_results %}
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <a href="{{ item.href }}">{{ item.title }}</a>
+                    <a href="https://arxiv.org/abs/{{ item.arxivId.split(':')[2] }}">{{ item.caption }}</a>
                 </div>
                 <div class="panel-body">
-                    {{ item.annotation }}
+                    {{ item.abstract }}
                 </div>
             </div>
         {% endfor %}
