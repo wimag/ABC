@@ -15,8 +15,6 @@ def index():
     search_result = empty
     if query is not None and len(query) > 0:
         search_result = agent.request(query)
-        print("Search for: {}".format(query))
-        print("Result: {}".format(search_result))
 
     return render_template("index.html", search_results=search_result)
 
