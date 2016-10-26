@@ -20,12 +20,13 @@ def build(*dirs):
 
     for f in files:
         with open(dir_of_file[f] + '/' + f) as data_file:
-            data = json.load(data_file)
-            for h in data[f][0]['href_list']:
-                g.add_edge(int(f), int(h))
+            d = json.load(data_file)
 
-    with open('graph.bin', "wb") as data:
-        pickle.dump(g, data)
+        for h in d[f][0]['href_list']:
+            g.add_edge(int(f), int(h))
+
+    with open('graph.bin', "wb") as datafile:
+        pickle.dump(g, datafile)
 
     ts = TopSort()
     order = ts.sort(g)

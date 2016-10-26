@@ -1,10 +1,12 @@
 
 class Graph:
-    adj = {}
-    vertex = set()
+    adj = None
+    vertex = None
     directed = None
 
     def __init__(self, directed=True):
+        self.adj = {}
+        self.vertex = set()
         self.directed = directed
 
     def add_vertex(self, v):
