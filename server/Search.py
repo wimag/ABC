@@ -24,3 +24,11 @@ class Search(object):
 
         response = result['hits']['hits']
         return list(map(lambda x: x['_source'], response))
+
+    def references(self, ids):
+        response = self.connection.mget(index=INDEX,
+             doc_type='article',
+             body={'ids': list(map(str, ids))})
+
+        print(response)
+        return None
