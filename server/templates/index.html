@@ -37,13 +37,13 @@
 
     {% for item in search_results %}
     <div class="row top-buffer">
-        <div> <a href="https://arxiv.org/abs/{{ item.arxivId.split(':')[2] }}">{{ item.caption }}</a></div>
+        <div> <a href="https://www.researchgate.net/publication/{{ item.id }}">{{ item.title }}</a></div>
         <div class="col-md-9">
             {{ item.abstract }}
         </div>
     </div>
     <div class="row">
-        <a href="/references?id={{ item.arxivId }}">[refences]</a>
+        <a href="/references?id={{ item.id }}">[refences]</a>
     </div>
     {% endfor %}
 

@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 
 from flask import Flask, render_template, request
+
 app = Flask(__name__)
 
 from Search import Search
-from GraphAPI import GraphAPI
+from GraphTools import load_graph
 import settings
 
 agent = Search()
-graphApi = GraphAPI(settings.GRAPH_PATH)
+graphApi = load_graph(settings.GRAPH_PATH)
+
 
 def prepare_for_view(search_results):
     for item in search_results:
@@ -19,6 +21,7 @@ def prepare_for_view(search_results):
 
     return search_results
 
+
 @app.route("/")
 def index():
     query = request.args.get('query')
@@ -27,7 +30,9 @@ def index():
         search_results = agent.request(query)
 
     search_results = prepare_for_view(search_results)
+    print(search_results)
     return render_template("index.html", search_results=search_results)
+
 
 @app.route("/references")
 def references():
@@ -36,18 +41,18 @@ def references():
     try:
         paper_id = int(paper_id)
     except ValueError:
-        peper_id = None
+        paper_id = None
 
     if paper_id is None:
         return render_template("index.html", search_results=[])
 
-    top_ids = [123]
-    # search for tops
-    references = agent.references(top_ids)
-    if references is None:
-        references = []
+    references = graphApi.adj_list(paper_id)
+    papers = agent.references(references)
+    if papers is None:
+        papers = []
 
-    return render_template("index.html", search_results=references)
+    return render_template("index.html", search_results=papers)
+
 
 if __name__ == "__main__":
     app.run()
