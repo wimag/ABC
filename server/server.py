@@ -4,9 +4,11 @@ from flask import Flask, render_template, request
 app = Flask(__name__)
 
 from Search import Search
+from GraphAPI import GraphAPI
 import settings
 
 agent = Search()
+graphApi = GraphAPI(settings.GRAPH_PATH)
 
 def prepare_for_view(search_results):
     for item in search_results:
