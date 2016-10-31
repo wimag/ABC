@@ -47,9 +47,9 @@ def references():
         return render_template("index.html", search_results=[])
 
     references = graphApi.adj_list(paper_id)
-    papers = agent.references(references)
-    if papers is None:
-        papers = []
+    papers = []
+    if len(references) > 0:
+        papers = agent.references(references)
 
     return render_template("index.html", search_results=papers)
 
