@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, make_response
 
 app = Flask(__name__)
 
@@ -12,6 +12,16 @@ agent = Search()
 graphApi = load_graph(settings.GRAPH_PATH)
 
 
+def get_random_path(id, count):
+    result = []
+    for i in range(count):
+        next = graphApi.adj_list(id)
+        if len(next) == 0: return result
+        result.append(next[0])
+        id = next[0]
+
+    return result
+
 def prepare_for_view(search_results):
     for item in search_results:
         if len(item['abstract']) < settings.POST_MAX_LENGTH:
@@ -22,6 +32,16 @@ def prepare_for_view(search_results):
     return search_results
 
 
+def prepare_for_view_left_items(items):
+    for item in items:
+        if len(item['title']) < settings.LEFT_BLOCK_LENGTH:
+            continue
+
+        item['title'] = item['title'][:settings.LEFT_BLOCK_LENGTH] + "..."
+
+    return items
+
+
 @app.route("/")
 def index():
     query = request.args.get('query')
@@ -30,8 +50,9 @@ def index():
         search_results = agent.request(query)
 
     search_results = prepare_for_view(search_results)
-    print(search_results)
-    return render_template("index.html", search_results=search_results)
+    response = make_response(render_template("index.html", search_results=search_results, history=[], suggestion=[]))
+    response.set_cookie('history', '', expires=0)
+    return response
 
 
 @app.route("/references")
@@ -44,15 +65,28 @@ def references():
         paper_id = None
 
     if paper_id is None:
-        return render_template("index.html", search_results=[])
+        return render_template("index.html", search_results=[], suggestion=[])
 
     references = graphApi.adj_list(paper_id)
     papers = []
     if len(references) > 0:
         papers = agent.references(references)
 
-    return render_template("index.html", search_results=papers)
+    history = []
+    if request.cookies.get('history') is not None:
+        history = request.cookies.get('history').split(",")
+
+    if str(paper_id) not in history: history.append(str(paper_id))
+
+    history_papers = prepare_for_view_left_items(agent.references(history))
+    path = get_random_path(paper_id, 5)
+    suggestion_papers = prepare_for_view_left_items(agent.references(path))
+    print(path)
+
+    response = make_response(render_template("index.html", search_results=papers, history=history_papers, suggestion=suggestion_papers))
+    response.set_cookie('history', ",".join(history))
+    return response
 
 
 if __name__ == "__main__":
-    app.run("0.0.0.0", 80)
+    app.run("0.0.0.0", 8080)

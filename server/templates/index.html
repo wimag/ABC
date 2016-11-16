@@ -21,32 +21,52 @@
 </head>
 <body>
 <div class="container">
-
-    <form action="/" method="get">
-    <div class="row top-buffer">
-        <div class="col-lg-6">
-            <div class="input-group">
-                    <input name="query" type="text" class="form-control" placeholder="Search for...">
-                    <span class="input-group-btn">
-                        <button class="btn btn-default" type="submit">Go!</button>
-                    </span>
-            </div>
-        </div>
-    </div>
-    </form>
-
-    {% for item in search_results %}
-    <div class="row top-buffer">
-        <div> <a href="https://www.researchgate.net/publication/{{ item.id }}">{{ item.title }}</a></div>
-        <div class="col-md-9">
-            {{ item.abstract }}
-        </div>
-    </div>
     <div class="row">
-        <a href="/references?id={{ item.id }}">[refences]</a>
+        <form action="/" method="get">
+            <div class="row top-buffer">
+                <div class="col-lg-6">
+                    <div class="input-group">
+                        <input name="query" type="text" class="form-control" placeholder="Search for...">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="submit">Go!</button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </form>
     </div>
-    {% endfor %}
 
+    <div class="row">
+        <div class="col-md-8">
+            {% for item in search_results %}
+                <div class="top-buffer">
+                    <div><a href="https://www.researchgate.net/publication/{{ item.id }}">{{ item.title }}</a></div>
+                    {{ item.abstract }}
+                    <div>
+                        <a href="/references?id={{ item.id }}">[refences]</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="col-md-4">
+            {% if history %}
+                <h4>Stash</h4>
+            {% endif %}
+            {% for item in history %}
+                <div>
+                    <a href="https://www.researchgate.net/publication/{{ item.id }}">&#128065;</a>[<a href="references?id={{ item.id }}">{{ item.title }}</a>]
+                </div>
+            {% endfor %}
+            {% if suggestion %}
+            <h4>Suggestion</h4>
+            {% endif %}
+            {% for item in suggestion %}
+                <div>
+                    <a href="https://www.researchgate.net/publication/{{ item.id }}">&#128065;</a>[<a href="references?id={{ item.id }}">{{ item.title }}</a>]
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 
 </div>
 </body>
