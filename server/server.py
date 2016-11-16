@@ -22,6 +22,26 @@ def get_random_path(id, count):
 
     return result
 
+
+def find_paper(id):
+    next = graphApi.adj_list(id)
+    if len(next) == 0: return []
+    next = sorted(next, key=lambda x: graphApi.in_degree(x), reverse=True)
+    for i in next:
+        if len(graphApi.adj_list(i)) == 0: return i
+    return next[0]
+
+
+def get_suggest(id, count):
+    result = []
+    for i in range(count):
+        paper = find_paper(id)
+        if paper is None: return result
+        result.append(paper)
+
+    return result
+
+
 def prepare_for_view(search_results):
     for item in search_results:
         if len(item['abstract']) < settings.POST_MAX_LENGTH:
@@ -79,10 +99,8 @@ def references():
     if str(paper_id) not in history: history.append(str(paper_id))
 
     history_papers = prepare_for_view_left_items(agent.references(history))
-    path = get_random_path(paper_id, 5)
+    path = get_suggest(paper_id, 10)
     suggestion_papers = prepare_for_view_left_items(agent.references(path))
-    print(path)
-
     response = make_response(render_template("index.html", search_results=papers, history=history_papers, suggestion=suggestion_papers))
     response.set_cookie('history', ",".join(history))
     return response
