@@ -25,10 +25,10 @@ def get_random_path(id, count):
 
 def find_paper(id):
     next = graphApi.adj_list(id)
-    if len(next) == 0: return []
+    if len(next) == 0: return None
     next = sorted(next, key=lambda x: graphApi.in_degree(x), reverse=True)
     for i in next:
-        if len(graphApi.adj_list(i)) == 0: return i
+        if len(graphApi.adj_list(i)) != 0: return i
     return next[0]
 
 
@@ -38,6 +38,7 @@ def get_suggest(id, count):
         paper = find_paper(id)
         if paper is None: return result
         result.append(paper)
+        id = paper
 
     return result
 
