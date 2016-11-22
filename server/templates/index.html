@@ -40,10 +40,10 @@
         <div class="col-md-8">
             {% for item in search_results %}
                 <div class="top-buffer">
-                    <div><a href="https://www.researchgate.net/publication/{{ item.id }}">{{ item.title }}</a></div>
+                    <div><a href="/references?id={{ item.id }}">{{ item.title }}</a></div>
                     {{ item.abstract }}
                     <div>
-                        <a href="/references?id={{ item.id }}">[refences]</a>
+                        <a href="https://www.researchgate.net/publication/{{ item.id }}">[aticle]</a>
                     </div>
                 </div>
             {% endfor %}
