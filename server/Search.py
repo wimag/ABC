@@ -25,7 +25,7 @@ class Search(object):
         response = result['hits']['hits']
         return list(map(lambda x: x['_source'], response))
 
-    def references(self, ids):
+    def papers(self, ids):
         response = self.connection.mget(index=INDEX,
                                         doc_type='articles',
                                         body={'ids': ids})

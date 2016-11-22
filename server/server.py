@@ -18,9 +18,12 @@ def index():
     if query is not None and len(query) > 0:
         search_results = agent.request(query)
 
+
     search_results = strip_element(search_results, "abstract", POST_MAX_LENGTH)
     response = make_response(render_template("index.html", search_results=search_results, history=[], suggestion=[]))
     response.set_cookie('history', '', expires=0)
+    if query is not None and len(query) > 0:
+        response.set_cookie('query', query)
     return response
 
 
@@ -39,17 +42,17 @@ def references():
     references = graph.adj_list(paper_id)
     papers = []
     if len(references) > 0:
-        papers = agent.references(references)
+        papers = agent.papers(references)
 
     history = []
     if request.cookies.get('history') is not None:
         history = request.cookies.get('history').split(",")
     if str(paper_id) not in history:
         history.append(str(paper_id))
-
-    path = get_suggest(graph, paper_id, 10)
-    history_papers, suggestion_papers = strip_element(agent.references(history), "title",
-                                                      LEFT_BLOCK_LENGTH), strip_element(agent.references(path), "title",
+    query = request.cookies.get('query')
+    path = get_suggest(graph, paper_id, 10, query)
+    history_papers, suggestion_papers = strip_element(agent.papers(history), "title",
+                                                      LEFT_BLOCK_LENGTH), strip_element(agent.papers(path), "title",
                                                                                         LEFT_BLOCK_LENGTH)
     response = make_response(
         render_template("index.html", search_results=papers, history=history_papers, suggestion=suggestion_papers))
