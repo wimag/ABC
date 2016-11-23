@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Graph</title>
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="js/jsnetworkx.js"></script>
+    <style>
+        #graph-canvas {
+            width: 70%;
+            height: 800px;
+        }
+
+        #info {
+            float: right;
+        }
+    </style>
+</head>
+<body>
+<div id="info">
+    <a href="">Paper</a>
+    <div id="abstract"></div>
+</div>
+<div id="graph-canvas"></div>
+<script>
+    var G;
+    var info = {};
+    let id = parseInt(window.location.search.substring(1));
+
+    function mouseOver(node) {
+    }
+
+    function onClick(node) {
+        node.data.color = '#0F0';
+        if (node.hasOwnProperty('requested')) {
+            return;
+        }
+
+        node.requested = true;
+        console.log(node);
+        $.getJSON(`/graph?id=${node.node}`, (data) => {
+            addNodes(data, node.node);
+        });
+    }
+
+    function mouseOut(node) {
+    }
+
+    function updateHandlers() {
+        d3.selectAll('.node').on('click', onClick);
+        d3.selectAll('.node').on('mouseover', mouseOver);
+        d3.selectAll('.node').on('mouseout', mouseOut);
+    }
+
+    function addNodes(g, point) {
+        G.addEdge(id, point);
+        let nodes = G.nodes();
+        for (let i in g.nodes) {
+            if (g.nodes[i].id in nodes) {
+                continue;
+            }
+
+            info[g.nodes[i].id] = g.nodes[i];
+            G.addNodesFrom([g.nodes[i].id]);
+            G.addEdge(g.nodes[i].id, point);
+        }
+
+        updateHandlers();
+    }
+
+    function drawGraph(g) {
+        G = new jsnx.Graph();
+        let nodes = [];
+        for (let i in g['nodes']) {
+            info[g.nodes[i].id] = g.nodes[i];
+            nodes.push(g.nodes[i].id);
+        }
+
+        G.addNodesFrom(nodes);
+        G.addEdgesFrom(g['edges']);
+
+        jsnx.draw(G, {
+            element: '#graph-canvas',
+            withLabels: true,
+            nodeAttr: {
+                r: 20,
+                id: (id) => {
+                    return `#node-${id}`;
+                }
+            },
+            nodeStyle: {
+                fill: function (d) {
+                    if (!d.data.hasOwnProperty('color'))
+                        d.data.color = '#0FF';
+
+                    return d.data.color;
+                }
+            },
+            layoutAttr: {
+                linkDistance: 20
+            },
+            stickyDrag: true,
+            nodeShape: 'circle'
+        }, true);
+        updateHandlers();
+    }
+
+    if (!isNaN(id)) {
+
+        $.getJSON(`/graph?id=${id}`, (data) => {
+            drawGraph(data);
+        });
+    }
+</script>
+</body>
+</html>

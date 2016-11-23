@@ -9,6 +9,7 @@ LEFT_BLOCK_LENGTH = 40
 
 # graph
 GRAPH_PATH = "../graph/graph.bin"
+DRAW_RADIUS = 1
 
 # auth
 keys = {

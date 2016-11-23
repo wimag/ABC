@@ -1,6 +1,7 @@
 from functools import wraps
 from flask import Response, current_app, request
 from settings import *
+from collections import deque
 
 import pickle
 import settings
@@ -51,3 +52,23 @@ def requires_auth(f):
 def init_config(app):
     for k, v in keys.items():
         app.config[k] = v
+
+
+def point_neighborhoods(graph, point, radius):
+    nodes = [point]
+    edges = []
+
+    queue = deque([(point, 0)])
+    while len(queue) != 0:
+        daddy, length = queue.popleft()
+        if length >= radius:
+            continue
+
+        neighbours = list(map(lambda x: (x, length + 1), graph.adj_list(point)))
+        for child, length in neighbours:
+            edges.append((daddy, child))
+            nodes.append(child)
+
+        queue += neighbours
+
+    return nodes, edges

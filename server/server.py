@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from flask import Flask, render_template, redirect, request, current_app, session, \
-    flash, url_for, make_response
+    flash, url_for, make_response, jsonify
 from flask_security import LoginForm, current_user, login_required, \
     login_user
 from flask_social.utils import get_provider_or_404
@@ -32,24 +32,24 @@ app.secret_key = 'SupaDupaSecretKey'
 webassets = Environment(app)
 webassets.config['sass_bin'] = '/usr/local/bin/sass'
 
-js_libs = Bundle("js/libs/jquery-1.7.1.min.js",
-                 "js/libs/bootstrap.min.js",
-                 filters="jsmin",
-                 output="js/libs.js")
+js_libs = Bundle('js/libs/jquery-1.7.1.min.js',
+                 'js/libs/bootstrap.min.js',
+                 filters='jsmin',
+                 output='js/libs.js')
 
-js_main = Bundle("js/src/main.js",
-                 filters="jsmin",
-                 output="js/main.js")
+js_main = Bundle('js/src/main.js',
+                 filters='jsmin',
+                 output='js/main.js')
 
-css_less = Bundle("css/src/styles.less",
-                  filters="less",
-                  output="css/styles.css",
+css_less = Bundle('css/src/styles.less',
+                  filters='less',
+                  output='css/styles.css',
                   debug=False)
 
-css_main = Bundle(Bundle("css/bootstrap.min.css"),
+css_main = Bundle(Bundle('css/bootstrap.min.css'),
                   css_less,
-                  filters="cssmin",
-                  output="css/main.css")
+                  filters='cssmin',
+                  output='css/main.css')
 
 webassets.cache = not app.debug
 app.config['ASSETS_DEBUG'] = True
@@ -79,15 +79,15 @@ def before_first_request():
         app.logger.error(str(e))
 
 
-@app.route("/")
+@app.route('/')
 def index():
     query = request.args.get('query')
     search_results = []
     if query is not None and len(query) > 0:
         search_results = agent.request(query)
 
-    search_results = strip_element(search_results, "abstract", POST_MAX_LENGTH)
-    response = make_response(render_template("index.html", search_results=search_results, history=[], suggestion=[]))
+    search_results = strip_element(search_results, 'abstract', POST_MAX_LENGTH)
+    response = make_response(render_template('index.html', search_results=search_results, history=[], suggestion=[]))
     response.set_cookie('history', '', expires=0)
 
     if query is not None and len(query) > 0:
@@ -99,17 +99,14 @@ def index():
     return response
 
 
-@app.route("/references")
+@app.route('/references')
 def references():
     paper_id = request.args.get('id', '')
 
     try:
         paper_id = int(paper_id)
     except ValueError:
-        paper_id = None
-
-    if paper_id is None:
-        return render_template("index.html", search_results=[], suggestion=[])
+        return render_template('index.html', search_results=[], suggestion=[])
 
     if current_user.is_authenticated:
         log = models.Click(current_user.id, paper_id)
@@ -123,18 +120,33 @@ def references():
 
     history = []
     if request.cookies.get('history') is not None:
-        history = request.cookies.get('history').split(",")
+        history = request.cookies.get('history').split(',')
     if str(paper_id) not in history:
         history.append(str(paper_id))
     query = request.cookies.get('query')
     path = get_suggest(graph, paper_id, 10, query)
-    history_papers, suggestion_papers = strip_element(agent.papers(history), "title",
-                                                      LEFT_BLOCK_LENGTH), strip_element(agent.papers(path), "title",
+    history_papers, suggestion_papers = strip_element(agent.papers(history), 'title',
+                                                      LEFT_BLOCK_LENGTH), strip_element(agent.papers(path), 'title',
                                                                                         LEFT_BLOCK_LENGTH)
     response = make_response(
-        render_template("index.html", search_results=papers, history=history_papers, suggestion=suggestion_papers))
-    response.set_cookie('history', ",".join(history))
+        render_template('index.html', search_results=papers, history=history_papers, suggestion=suggestion_papers))
+    response.set_cookie('history', ','.join(history))
     return response
+
+
+@app.route('/graph')
+def draw_graph():
+    paper_id = request.args.get('id', '')
+    try:
+        paper_id = int(paper_id)
+    except ValueError:
+        return render_template('index.html', search_results=[], suggestion=[])
+
+    nodes, edges = point_neighborhoods(graph, paper_id, DRAW_RADIUS)
+    articles = agent.papers(nodes)
+    articles_id = list(map(lambda x: x['id'], articles))
+    edges = list(filter(lambda x: x[0] in articles_id or x[1] in articles_id, edges))
+    return jsonify(nodes=articles, edges=edges)
 
 
 @app.route('/login')
@@ -210,7 +222,7 @@ def social_post(provider_id):
             api.PostUpdate(message)
         if provider_id == 'facebook':
             display_name = 'Facebook'
-            api.put_object("me", "feed", message=message)
+            api.put_object('me', 'feed', message=message)
 
         flash('Message posted to %s: %s' % (display_name, message), 'info')
 
@@ -234,7 +246,7 @@ def delete_user(user_id):
     return redirect(url_for('admin'))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     init_config(app)
     security_ds = SQLAlchemyUserDatastore(db, models.User, models.Role)
     social_ds = SQLAlchemyConnectionDatastore(db, models.Connection)
