@@ -21,3 +21,45 @@ def strip_element(items, title, length):
 
     return items
 
+
+from functools import wraps
+
+from flask import Response, current_app, request
+
+
+def check_auth(username, password):
+    creds = current_app.config['ADMIN_CREDENTIALS'].split(',')
+    return username == creds[0] and password == creds[1]
+
+
+def authenticate():
+    return Response(
+    'Could not verify your access level for that URL.\n'
+    'You have to login with proper credentials', 401,
+    {'WWW-Authenticate': 'Basic realm="Login Required"'})
+
+
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not check_auth(auth.username, auth.password):
+            return authenticate()
+        return f(*args, **kwargs)
+    return decorated
+
+keys = {
+    'SOCIAL_TWITTER': {
+        'consumer_key': 'twitter consumer key',
+        'consumer_secret': 'twitter consumer secret'
+    },
+    'SOCIAL_FACEBOOK': {
+        'consumer_key': '377587635922069',
+        'consumer_secret': 'fd729a0e139c25b9f3a555ed8aa7ddb4',
+        'request_token_params': {'scope': 'email,publish_stream'}
+    }
+}
+# TODO nb change flask_social update_recursive to items instead of iteritems
+def init_config(app):
+    for k, v in keys.items():
+        app.config[k] = v
