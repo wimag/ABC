@@ -54,15 +54,17 @@
             {% endif %}
             {% for item in history %}
                 <div>
-                    <a href="https://www.researchgate.net/publication/{{ item.id }}">&#128065;</a>[<a href="references?id={{ item.id }}">{{ item.title }}</a>]
+                    <a href="https://www.researchgate.net/publication/{{ item.id }}">&#128065;</a>[<a
+                        href="references?id={{ item.id }}">{{ item.title }}</a>]
                 </div>
             {% endfor %}
             {% if suggestion %}
-            <h4>Suggestion</h4>
+                <h4>Suggestion</h4>
             {% endif %}
             {% for item in suggestion %}
                 <div>
-                    <a href="https://www.researchgate.net/publication/{{ item.id }}">&#128065;</a>[<a href="references?id={{ item.id }}">{{ item.title }}</a>]
+                    <a href="https://www.researchgate.net/publication/{{ item.id }}">&#128065;</a>[<a
+                        href="references?id={{ item.id }}">{{ item.title }}</a>]
                 </div>
             {% endfor %}
         </div>

@@ -3,6 +3,7 @@ from flask_wtf import Form
 from wtforms import TextField, PasswordField, ValidationError
 from wtforms.validators import Required, Email, Length, Regexp, EqualTo
 
+
 class UniqueUser(object):
     def __init__(self, message="User exists"):
         self.message = message

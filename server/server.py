@@ -18,19 +18,19 @@ from utils import *
 from suggestions import get_suggest
 
 from forms import RegisterForm
-
+from flask_assets import Bundle
+import models
+from utils import requires_auth
+import database
 
 app = Flask(__name__)
 db = SQLAlchemy(app)
-
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tmp/test.db'
 app.secret_key = 'SupaDupaSecretKey'
 
 webassets = Environment(app)
 webassets.config['sass_bin'] = '/usr/local/bin/sass'
-
-from flask_assets import Bundle
 
 js_libs = Bundle("js/libs/jquery-1.7.1.min.js",
                  "js/libs/bootstrap.min.js",
@@ -51,7 +51,6 @@ css_main = Bundle(Bundle("css/bootstrap.min.css"),
                   filters="cssmin",
                   output="css/main.css")
 
-
 webassets.cache = not app.debug
 app.config['ASSETS_DEBUG'] = True
 
@@ -59,26 +58,17 @@ webassets.register('js_libs', js_libs)
 webassets.register('js_main', js_main)
 webassets.register('css_main', css_main)
 
-import models
-
-
-
 agent = Search()
 graph = load_graph(GRAPH_PATH)
-
-from utils import requires_auth
-
-
-import database
-
-
 API = None
+
 
 def getApi():
     global API
     if API is None:
         API = Api(app)
     return API
+
 
 @app.before_first_request
 def before_first_request():
@@ -95,7 +85,6 @@ def index():
     search_results = []
     if query is not None and len(query) > 0:
         search_results = agent.request(query)
-
 
     search_results = strip_element(search_results, "abstract", POST_MAX_LENGTH)
     response = make_response(render_template("index.html", search_results=search_results, history=[], suggestion=[]))
@@ -147,6 +136,7 @@ def references():
     response.set_cookie('history', ",".join(history))
     return response
 
+
 @app.route('/login')
 def login():
     if current_user.is_authenticated:
@@ -191,7 +181,6 @@ def register(provider_id=None):
         return render_template('thanks.html', user=user)
 
     login_failed = int(request.args.get('login_failed', 0))
-
     return render_template('register.html',
                            form=form,
                            provider=provider,
@@ -203,8 +192,8 @@ def register(provider_id=None):
 @login_required
 def profile():
     return render_template('profile.html',
-        twitter_conn=current_app.social.twitter.get_connection(),
-        facebook_conn=current_app.social.facebook.get_connection())
+                           twitter_conn=current_app.social.twitter.get_connection(),
+                           facebook_conn=current_app.social.facebook.get_connection())
 
 
 @app.route('/profile/<provider_id>/post', methods=['POST'])
@@ -243,6 +232,7 @@ def delete_user(user_id):
     db.session.commit()
     flash('User deleted successfully', 'info')
     return redirect(url_for('admin'))
+
 
 if __name__ == "__main__":
     init_config(app)

@@ -33,4 +33,3 @@ class Search(object):
         founded = lambda x: x['found']
         source = lambda x: x['_source']
         return list(map(source, filter(founded, response['docs'])))
-

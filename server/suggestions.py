@@ -1,5 +1,6 @@
 from similarity import similarity_finder
 
+
 def get_random_path(graph, id, count):
     result = []
     for i in range(count):

@@ -4,12 +4,11 @@ from database import db
 from flask_security import UserMixin, RoleMixin
 
 roles_users = db.Table('roles_users',
-    db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
-    db.Column('role_id', db.Integer(), db.ForeignKey('roles.id')))
+                       db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
+                       db.Column('role_id', db.Integer(), db.ForeignKey('roles.id')))
 
 
 class Role(db.Model, RoleMixin):
-
     __tablename__ = "roles"
 
     id = db.Column(db.Integer(), primary_key=True)
@@ -18,7 +17,6 @@ class Role(db.Model, RoleMixin):
 
 
 class User(db.Model, UserMixin):
-
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -31,13 +29,12 @@ class User(db.Model, UserMixin):
     current_login_ip = db.Column(db.String(100))
     login_count = db.Column(db.Integer)
     roles = db.relationship('Role', secondary=roles_users,
-            backref=db.backref('users', lazy='dynamic'))
+                            backref=db.backref('users', lazy='dynamic'))
     connections = db.relationship('Connection',
-            backref=db.backref('user', lazy='joined'), cascade="all")
+                                  backref=db.backref('user', lazy='joined'), cascade="all")
 
 
 class Connection(db.Model):
-
     __tablename__ = "connections"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -64,7 +61,6 @@ class Click(db.Model):
         self.user_id = user_id
         self.date = datetime.datetime.now()
         self.document = document
-
 
 
 class Log(db.Model):
