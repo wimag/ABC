@@ -54,8 +54,8 @@ keys = {
         'consumer_secret': 'twitter consumer secret'
     },
     'SOCIAL_FACEBOOK': {
-        'consumer_key': '377587635922069',
-        'consumer_secret': 'fd729a0e139c25b9f3a555ed8aa7ddb4',
+        'consumer_key': 'XXXXX',
+        'consumer_secret': 'XXXXX',
         'request_token_params': {'scope': 'email,publish_stream'}
     }
 }
