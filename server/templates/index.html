@@ -1,75 +1,61 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ABC</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+{% from '_macros.html' import render_field %}
+{% extends '/layouts/boilerplate.html' %}
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
-          integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
-            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-            crossorigin="anonymous"></script>
-    <style>
-        .top-buffer {
-            margin-top: 20px;
-        }
-    </style>
-</head>
-<body>
-<div class="container">
-    <div class="row">
-        <form action="/" method="get">
-            <div class="row top-buffer">
-                <div class="col-lg-6">
-                    <div class="input-group">
-                        <input name="query" type="text" class="form-control" placeholder="Search for...">
-                        <span class="input-group-btn">
+
+{% macro social_login(provider_id, display_name) %}
+    <form action="{{ url_for('social.login', provider_id=provider_id) }}" method="POST">
+        <button type="submit" class="btn btn-primary btn-large">Login with {{ display_name }}</button>
+    </form>
+{% endmacro %}
+
+{% block layout %}
+<div class="row">
+    <form action="/" method="get">
+        <div class="row top-buffer">
+            <div class="col-lg-6">
+                <div class="input-group">
+                    <input name="query" type="text" class="form-control" placeholder="Search for...">
+                    <span class="input-group-btn">
                             <button class="btn btn-default" type="submit">Go!</button>
                         </span>
-                    </div>
                 </div>
             </div>
-        </form>
-    </div>
-
-    <div class="row">
-        <div class="col-md-8">
-            {% for item in search_results %}
-                <div class="top-buffer">
-                    <div><a href="/references?id={{ item.id }}">{{ item.title }}</a></div>
-                    {{ item.abstract }}
-                    <div>
-                        <a href="https://www.researchgate.net/publication/{{ item.id }}">[article]</a><a href="/static/graph.html?{{ item.id }}">[graph]</a>
-                    </div>
-                </div>
-            {% endfor %}
         </div>
-        <div class="col-md-4">
-            {% if history %}
-                <h4>Stash</h4>
-            {% endif %}
-            {% for item in history %}
-                <div>
-                    <a href="https://www.researchgate.net/publication/{{ item.id }}">&#128065;</a>[<a
-                        href="references?id={{ item.id }}">{{ item.title }}</a>]
-                </div>
-            {% endfor %}
-            {% if suggestion %}
-                <h4>Suggestion</h4>
-            {% endif %}
-            {% for item in suggestion %}
-                <div>
-                    <a href="https://www.researchgate.net/publication/{{ item.id }}">&#128065;</a>[<a
-                        href="references?id={{ item.id }}">{{ item.title }}</a>]
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-
+    </form>
 </div>
-</body>
-</html>
+
+<div class="row">
+    <div class="col-md-8">
+        {% for item in search_results %}
+            <div class="top-buffer">
+                <div><a href="/references?id={{ item.id }}">{{ item.title }}</a></div>
+                {{ item.abstract }}
+                <div>
+                    <a href="https://www.researchgate.net/publication/{{ item.id }}">[article]</a><a
+                        href="/static/graph.html?{{ item.id }}">[graph]</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="col-md-4">
+        {% if history %}
+            <h4>Stash</h4>
+        {% endif %}
+        {% for item in history %}
+            <div>
+                <a href="https://www.researchgate.net/publication/{{ item.id }}">&#128065;</a>[<a
+                    href="references?id={{ item.id }}">{{ item.title }}</a>]
+            </div>
+        {% endfor %}
+        {% if suggestion %}
+            <h4>Suggestion</h4>
+        {% endif %}
+        {% for item in suggestion %}
+            <div>
+                <a href="https://www.researchgate.net/publication/{{ item.id }}">&#128065;</a>[<a
+                    href="references?id={{ item.id }}">{{ item.title }}</a>]
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
