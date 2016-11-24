@@ -3,26 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <title>Graph</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ABC</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+          integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
     <script src="http://code.jquery.com/jquery.js"></script>
     <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
     <script src="js/jsnetworkx.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            crossorigin="anonymous"></script>
     <style>
         #graph-canvas {
-            width: 70%;
             height: 800px;
-        }
-
-        #info {
-            float: right;
         }
     </style>
 </head>
 <body>
-<div id="info">
-    <a href="">Paper</a>
-    <div id="abstract"></div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8">
+            <div id="graph-canvas"></div>
+        </div>
+        <div class="col-md-4">
+            <div id="info">
+                <div><a id="graph-link" href=""></a></div>
+                <div id="abstract"></div>
+                <div>
+                    <a id="article-link" href="">[article]</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
 </div>
-<div id="graph-canvas"></div>
 <script>
     var G;
     var info = {};
@@ -33,15 +52,26 @@
 
     function onClick(node) {
         node.data.color = '#0F0';
+        let data = info[node.node];
+        $("#graph-link").html(data.title);
+        $("#abstract").html(data.abstract);
+        $("#article-link").attr("href", `https://www.researchgate.net/publication/${data.id}`);
+        $("#graph-link").attr("href", `/references?id=${data.id}`);
+        $("#info").show();
+
         if (node.hasOwnProperty('requested')) {
             return;
         }
 
         node.requested = true;
-        console.log(node);
         $.getJSON(`/graph?id=${node.node}`, (data) => {
             addNodes(data, node.node);
         });
+
+        if (!(node.node in info)) {
+            $("#info").hide();
+            return;
+        }
     }
 
     function mouseOut(node) {
@@ -54,7 +84,6 @@
     }
 
     function addNodes(g, point) {
-        G.addEdge(id, point);
         let nodes = G.nodes();
         for (let i in g.nodes) {
             if (g.nodes[i].id in nodes) {
@@ -72,19 +101,19 @@
     function drawGraph(g) {
         G = new jsnx.Graph();
         let nodes = [];
-        for (let i in g['nodes']) {
+        for (let i in g.nodes) {
             info[g.nodes[i].id] = g.nodes[i];
-            nodes.push(g.nodes[i].id);
+            nodes.push([g.nodes[i].id, g.nodes[i]]);
         }
 
         G.addNodesFrom(nodes);
-        G.addEdgesFrom(g['edges']);
+        G.addEdgesFrom(g.edges);
 
         jsnx.draw(G, {
             element: '#graph-canvas',
             withLabels: true,
             nodeAttr: {
-                r: 20,
+                r: 40,
                 id: (id) => {
                     return `#node-${id}`;
                 }
@@ -98,7 +127,6 @@
                 }
             },
             layoutAttr: {
-                linkDistance: 20
             },
             stickyDrag: true,
             nodeShape: 'circle'
@@ -106,6 +134,7 @@
         updateHandlers();
     }
 
+    $("#info").hide();
     if (!isNaN(id)) {
 
         $.getJSON(`/graph?id=${id}`, (data) => {

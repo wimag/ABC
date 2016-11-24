@@ -12,7 +12,7 @@ from flask_login import LoginManager
 from flask_assets import Environment
 
 from flask_sqlalchemy import SQLAlchemy
-from Search import *
+from search import *
 from settings import *
 from utils import *
 from suggestions import get_suggest
@@ -58,7 +58,7 @@ webassets.register('js_libs', js_libs)
 webassets.register('js_main', js_main)
 webassets.register('css_main', css_main)
 
-agent = Search()
+agent = search()
 graph = load_graph(GRAPH_PATH)
 API = None
 

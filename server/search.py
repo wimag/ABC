@@ -3,7 +3,7 @@ from elasticsearch import Elasticsearch
 from settings import HOST, PORT, INDEX
 
 
-class Search(object):
+class search(object):
     def __init__(self):
         self.connection = Elasticsearch([{'host': HOST, 'port': PORT}])
         pass

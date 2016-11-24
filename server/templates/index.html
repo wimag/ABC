@@ -43,7 +43,7 @@
                     <div><a href="/references?id={{ item.id }}">{{ item.title }}</a></div>
                     {{ item.abstract }}
                     <div>
-                        <a href="https://www.researchgate.net/publication/{{ item.id }}">[article]</a>
+                        <a href="https://www.researchgate.net/publication/{{ item.id }}">[article]</a><a href="/static/graph.html?{{ item.id }}">[graph]</a>
                     </div>
                 </div>
             {% endfor %}
