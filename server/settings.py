@@ -11,6 +11,9 @@ LEFT_BLOCK_LENGTH = 40
 GRAPH_PATH = "../graph/graph.bin"
 DRAW_RADIUS = 1
 
+# use Quality Analysis
+USE_QA = True
+
 # auth
 keys = {
     'SOCIAL_TWITTER': {

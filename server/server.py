@@ -22,6 +22,7 @@ from flask_assets import Bundle
 import models
 from utils import requires_auth
 import database
+from qa.quality_analysis import analyzer
 
 app = Flask(__name__)
 db = SQLAlchemy(app)
@@ -85,6 +86,8 @@ def index():
     search_results = []
     if query is not None and len(query) > 0:
         search_results = agent.request(query)
+        if USE_QA:
+            print(analyzer.compare_with_scholar(query, search_results))
 
     search_results = strip_element(search_results, 'abstract', POST_MAX_LENGTH)
     response = make_response(render_template('index.html', search_results=search_results, history=[], suggestion=[]))
@@ -232,14 +235,14 @@ def social_post(provider_id):
 @app.route('/admin')
 @requires_auth
 def admin():
-    users = User.query.all()
+    users = models.User.query.all()
     return render_template('admin.html', users=users)
 
 
 @app.route('/admin/users/<user_id>', methods=['DELETE'])
 @requires_auth
 def delete_user(user_id):
-    user = User.query.get_or_404(user_id)
+    user = models.User.query.get_or_404(user_id)
     db.session.delete(user)
     db.session.commit()
     flash('User deleted successfully', 'info')
@@ -253,4 +256,5 @@ if __name__ == '__main__':
 
     app.security = Security(app, security_ds)
     app.social = Social(app, social_ds)
+    analyzer.start()
     app.run()
