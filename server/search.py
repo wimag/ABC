@@ -14,8 +14,7 @@ class search(object):
                 'match': {
                     'abstract': {
                         'query': query,
-                        'type': 'phrase_prefix',
-                        'max_expansions': 50
+                        'operator': 'or'
                     }
                 }
             },
