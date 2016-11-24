@@ -12,7 +12,7 @@ GRAPH_PATH = "../graph/graph.bin"
 DRAW_RADIUS = 1
 
 # use Quality Analysis
-USE_QA = True
+USE_QA = False
 
 # auth
 keys = {

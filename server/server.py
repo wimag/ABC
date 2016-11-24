@@ -256,5 +256,6 @@ if __name__ == '__main__':
 
     app.security = Security(app, security_ds)
     app.social = Social(app, social_ds)
-    analyzer.start()
+    if USE_QA:
+        analyzer.start()
     app.run()
