@@ -25,6 +25,9 @@ class search(object):
         return list(map(lambda x: x['_source'], response))
 
     def papers(self, ids):
+        if len(ids) == 0:
+            return []
+
         response = self.connection.mget(index=INDEX,
                                         doc_type='articles',
                                         body={'ids': ids})
